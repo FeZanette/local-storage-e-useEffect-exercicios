@@ -1,49 +1,70 @@
-import { useEffect, useState } from 'react'
-import { DivContainer, InputsContainer, ListaDeTarefas, Tarefa } from './style';
-
-
+import { useEffect, useState } from "react";
+import { DivContainer, InputsContainer, ListaDeTarefas, Tarefa } from "./style";
 
 function App() {
   const [tarefas, setTarefas] = useState([]);
   const [valorDoInput, setValorDoInput] = useState("");
-  const [filtro, setFiltro] = useState("")
+  const [filtro, setFiltro] = useState("");
 
-  // useEffect(() => {
+  useEffect(() => {
+    const tarefasString = JSON.stringify(tarefas);
+    if (tarefas.length > 0) localStorage.setItem("tarefas", tarefasString);
+  }, [tarefas]);
 
-  // }, [])
-
-  // useEffect(() => {
-
-  // }, [])
+  useEffect(() => {
+    const pegarTarefas = JSON.parse(localStorage.getItem("tarefas"))
+    if (pegarTarefas) setTarefas(pegarTarefas)   
+  }, []);
 
   const pegarValorDoInput = (event) => {
-    console.log("aaa");
-  }
+    setValorDoInput(event.target.value);
+    // console.log("aaa");
+  };
 
   const criarTarefa = () => {
-    console.log("aaa");
-  }
+    const novaTarefa = {
+      id: Date.now(),
+      texto: valorDoInput,
+      completa: false,
+    };
+    const copiaDoEstado = [...tarefas, novaTarefa];
+    // EVITA ADICIONAR TAREFAS EM BRANCO NO INPUT
+    if (valorDoInput.trim !== "") {
+      // ATUALIZDA O ESTADO tarefas ADICIONANDO O QUE É DIGITADO
+      setTarefas(copiaDoEstado);
+      // APÓS ADICIONAR TAREFA, O INPUT FICA EM BRANCO
+      setValorDoInput("");
+    }
+    // console.log("aaa");
+  };
 
   const selecionarTarefa = (id) => {
-    console.log("aaa");
-  }
+    const tarefasAtualizadas = tarefas.map((item) => {
+      if (item.id === id) {
+        return { ...item, completa: !item.completa };
+      } else {
+        return item;
+      }
+    });
+    setTarefas(tarefasAtualizadas);
+    // console.log(tarefas);
+  };
 
   const pegarValorDoSelect = (event) => {
-    console.log("aaa");
-  }
+    setFiltro(event.target.value);
+    // console.log("aaa");
+  };
 
-
-  const listaFiltrada = tarefas.filter(tarefa => {
+  const listaFiltrada = tarefas.filter((tarefa) => {
     switch (filtro) {
-      case 'pendentes':
-        return !tarefa.completa
-      case 'completas':
-        return tarefa.completa
+      case "pendentes":
+        return !tarefa.completa;
+      case "completas":
+        return tarefa.completa;
       default:
-        return true
+        return true;
     }
   });
-
 
   return (
     <DivContainer>
@@ -63,7 +84,7 @@ function App() {
         </select>
       </InputsContainer>
       <ListaDeTarefas>
-        {listaFiltrada.map(tarefa => {
+        {listaFiltrada.map((tarefa) => {
           return (
             <Tarefa
               completa={tarefa.completa}
@@ -71,12 +92,11 @@ function App() {
             >
               {tarefa.texto}
             </Tarefa>
-          )
+          );
         })}
       </ListaDeTarefas>
     </DivContainer>
-  )
+  );
 }
 
-
-export default App
+export default App;
